@@ -6,7 +6,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" data-toggle="modal" data-target="#exampleModal">Add Employee <span class="sr-only"></span></a>
+                <a class="nav-link" (click)="clearModes()" data-toggle="modal" data-target="#exampleModal">Add Employee <span class="sr-only"></span></a>
             </li>
         </ul>
         <form class="form-inline mt-2 mt-md-0">
@@ -34,7 +34,7 @@
                 <div class="card-body">
                     <div class="float-right btn-group btn-group-sm">
                         <a class="btn btn-primary" (click)="populateEditModal(employee)" data-target="#exampleModal" data-toggle="modal"><i class="fa fa-pencil"></i> </a>
-                        <a class="btn btn-secondary" (click)="openDeleteModal()" data-target="#exampleModal" data-toggle="modal"><i class="fa fa-times"></i></a>
+                        <a class="btn btn-secondary" (click)="openDeleteModal(employee.id)" data-target="#exampleModal" data-toggle="modal"><i class="fa fa-times"></i></a>
                     </div>
                 </div>
             </div>
@@ -48,13 +48,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">{{editMode ? 'Edit' : deleteMode ? 'Delete' : 'Add'}} Employee</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" (click)="clearModes()" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body" *ngIf="!deleteMode">
             <form class="form col-md-12 center-block" [formGroup]="employeeForm">
                 <input type="hidden" formControlName="id">
+                <input type="hidden" formControlName="employeeCode">
                 <div class="form-group">
                   <input type="text" formControlName="name" class="form-control input-lg" placeholder="Name">
                 </div>
@@ -76,8 +77,9 @@
             <p>Are you sure want to delete this record ?</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" data-dismiss="modal" [disabled]="employeeForm.invalid" (click)="handleAddEmployee()" class="btn btn-primary">Save changes</button>
+          <button type="button"  (click)="clearModes()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" *ngIf="!deleteMode" data-dismiss="modal" [disabled]="employeeForm.invalid" (click)="editMode ? handleUpdateEmployee() : handleAddEmployee()" class="btn btn-primary">Save changes</button>
+          <button type="button" *ngIf="deleteMode" data-dismiss="modal"  (click)="handleDeleteEmployee()" class="btn btn-primary">Delete record</button>
         </div>
       </div>
     </div>

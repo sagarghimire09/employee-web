@@ -13,6 +13,7 @@ export class EmployeeListComponent implements OnInit {
   employeeForm: FormGroup;
   editMode: boolean = false;
   deleteMode: boolean = false;
+  selectedId: number;
 
   constructor(private employeeService: EmployeeService,
               private fb: FormBuilder) { }
@@ -37,7 +38,8 @@ export class EmployeeListComponent implements OnInit {
       email: [null, Validators.required],
       phone: [null, null],
       jobTitle: [null, Validators.required],
-      imageUrl: [null, null]
+      imageUrl: [null, null],
+      employeeCode: [null, null]
     });
   }
 
@@ -48,6 +50,20 @@ export class EmployeeListComponent implements OnInit {
         (response: Employee) => {
           this.employeeForm.reset();
           this.getAllEmployees();
+          this.clearModes();
+        }
+      )
+    }
+  }
+
+  handleUpdateEmployee(): void {
+    if(this.employeeForm.valid){
+      const employee = this.getEmployee();
+      this.employeeService.updateEmployee(employee).subscribe(
+        (response: Employee) => {
+          this.employeeForm.reset();
+          this.getAllEmployees();
+          this.clearModes();
         }
       )
     }
@@ -60,7 +76,8 @@ export class EmployeeListComponent implements OnInit {
       email: this.employeeForm.controls.email.value,
       phone: this.employeeForm.controls.phone.value,
       jobTitle: this.employeeForm.controls.jobTitle.value,
-      imageUrl: this.employeeForm.controls.imageUrl.value
+      imageUrl: this.employeeForm.controls.imageUrl.value,
+      employeeCode: this.employeeForm.controls.employeeCode?.value
     }
   }
 
@@ -73,10 +90,28 @@ export class EmployeeListComponent implements OnInit {
     this.employeeForm.controls.phone.setValue(employee.phone);
     this.employeeForm.controls.jobTitle.setValue(employee.jobTitle);
     this.employeeForm.controls.imageUrl.setValue(employee.imageUrl);
+    this.employeeForm.controls.employeeCode.setValue(employee.employeeCode)
   }
 
-  openDeleteModal(): void {
+  openDeleteModal(id: number): void {
     this.deleteMode = true;
+    this.selectedId = id;
+  }
+
+  handleDeleteEmployee() {
+    const employee = this.getEmployee();
+      this.employeeService.deleteEmployee(this.selectedId).subscribe(
+        (response: void) => {
+          this.getAllEmployees();
+          this.clearModes();
+        }
+      )
+  }
+
+  clearModes(): void {
+    this.editMode = false;
+    this.deleteMode = false;
+    this.employeeForm.reset();
   }
 
 }
